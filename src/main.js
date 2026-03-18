@@ -39,8 +39,10 @@ const viewPitchValue = $("viewPitchValue");
 const stringLengthWrap = $("stringLengthWrap");
 const stringLengthInput = $("stringLengthInput");
 const stringLengthValue = $("stringLengthValue");
-const chargeCountWrap = $("chargeCountWrap");
-const chargeCountSelect = $("chargeCountSelect");
+const freeBuilderWrap = $("freeBuilderWrap");
+const builderChargeValue = $("builderChargeValue");
+const addChargeBtn = $("addChargeBtn");
+const clearChargesBtn = $("clearChargesBtn");
 const editChargeWrap = $("editChargeWrap");
 const editChargeSelect = $("editChargeSelect");
 const xPositionWrap = $("xPositionWrap");
@@ -80,7 +82,7 @@ const PRESET_ORDER = [
   "pyramid3d",
   "cube3d",
   "icosahedron3d",
-  "free3d",
+  "free2d",
   "fission",
   "equilibrium",
 ];
@@ -271,39 +273,33 @@ const PRESETS = {
     is3d: true,
     view: { yawDeg: -24, pitchDeg: 24 },
   },
-  free3d: {
-    title: "Free 3D Builder",
-    shortTitle: "Free 3D",
+  free2d: {
+    title: "Free 2D Builder",
+    shortTitle: "Free 2D",
     prompt:
-      "Build your own configuration with up to five charges. Rotate the scene, pick a target, and use the position sliders to create any arrangement you want.",
+      "Start with an empty plane, add one charge at a time, then choose a target and test your own Coulomb-law geometry.",
     description:
-      "A free-form 3D scenario for custom Coulomb-law setups with up to five charges.",
+      "A blank two-dimensional arena where students add up to five charges and build their own scenario from scratch.",
     formulaNote:
-      "Choose your own geometry, then use the component path plus azimuth/elevation labels to explain the net force.",
+      "Create the geometry first, then use the vectors and force table to decide whether the interactions add, cancel, or compete.",
     teacherUse:
-      "Useful for student-designed investigations, challenge problems, and modeling textbook diagrams not covered by the presets.",
-    docRef: "Open inquiry: student-built 3D charge systems with at most five charges.",
+      "Useful for student-designed investigations, custom textbook diagrams, and quick what-if scenarios that are not covered by the fixed presets.",
+    docRef: "Open inquiry: student-built 2D charge systems with at most five charges.",
     chargeUnitLabel: "microcoulombs",
     chargeUnitShort: "uC",
     chargeScale: 1e-6,
     chargeRange: { min: -8, max: 8, step: 0.1 },
     distanceDisplay: { factor: 1, label: "m", digits: 2 },
-    world: world3D(-3.5, 3.5, -3.0, 3.0, -3.5, 3.5),
-    charges: [
-      makeCharge("A", 4.0, -1.6, 0.8, -0.8, "xyz"),
-      makeCharge("B", -3.5, 1.7, -0.4, 0.9, "xyz"),
-      makeCharge("C", 2.5, 0.1, 1.4, 0.1, "xyz"),
-      makeCharge("D", -2.8, -0.6, -1.3, 1.7, "xyz"),
-    ],
-    targetIndex: 2,
+    world: world2D(-3.5, 3.5, -3.0, 3.0),
+    charges: [],
+    targetIndex: 0,
     editIndex: 0,
     massG: 0.5,
     stringLengthCm: 40,
     softening: 0.22,
-    is3d: true,
+    is3d: false,
     freeBuilder: true,
     maxCharges: 5,
-    view: { yawDeg: -30, pitchDeg: 18 },
   },
   fission: {
     title: "U-235 Fission Scale Demo",
@@ -343,7 +339,7 @@ const PRESETS = {
     description:
       "A pair-force setup with a force-balance readout for hanging-sphere and pendulum-style equilibrium questions.",
     formulaNote:
-      "Here the electric force is the horizontal partner in equilibrium: tan(theta) = |Fe| / (mg).",
+      "Here the electric force acts along the line joining the spheres, while tension follows the string and weight remains vertical.",
     teacherUse:
       "Use this as the bridge to suspended-sphere, pendulum, and equilibrium-angle homework problems.",
     docRef: "Homework Part I #7, #10, #11 and the notes Equilibrium section.",
@@ -404,6 +400,9 @@ function init() {
   state.theme = localStorage.getItem(STORAGE_KEY_THEME) || "dark";
   state.activity = localStorage.getItem(STORAGE_KEY_ACTIVITY) || "inquiry";
   state.presetKey = localStorage.getItem(STORAGE_KEY_PRESET) || "pair";
+  if (state.presetKey === "free3d") {
+    state.presetKey = "free2d";
+  }
 
   activityMode.value = state.activity;
   showVectors.checked = true;
@@ -497,10 +496,8 @@ function init() {
     renderAll();
   });
 
-  chargeCountSelect.addEventListener("change", () => {
-    if (!getPreset().freeBuilder) return;
-    setFreeChargeCount(Number(chargeCountSelect.value));
-  });
+  addChargeBtn.addEventListener("click", addFreeCharge);
+  clearChargesBtn.addEventListener("click", clearFreeCharges);
 
   xPositionInput.addEventListener("input", () => updateEditedChargePosition("x", Number(xPositionInput.value)));
   yPositionInput.addEventListener("input", () => updateEditedChargePosition("y", Number(yPositionInput.value)));
@@ -550,8 +547,8 @@ function loadPreset(key) {
   state.presetKey = key;
   state.charges = cloneCharges(preset.charges);
   state.defaultCharges = cloneCharges(preset.charges);
-  state.targetIndex = Math.min(preset.targetIndex, state.charges.length - 1);
-  state.editIndex = Math.min(preset.editIndex ?? 0, state.charges.length - 1);
+  state.targetIndex = state.charges.length ? Math.min(preset.targetIndex, state.charges.length - 1) : 0;
+  state.editIndex = state.charges.length ? Math.min(preset.editIndex ?? 0, state.charges.length - 1) : 0;
   state.massG = preset.massG;
   state.chargeMassesG = preset.massByChargeG ? [...preset.massByChargeG] : state.charges.map(() => preset.massG);
   state.stringLengthCm = preset.stringLengthCm;
@@ -629,10 +626,11 @@ function syncControlsFromState() {
   xPositionWrap.classList.toggle("is-hidden", !preset.is3d);
   yPositionWrap.classList.toggle("is-hidden", !preset.is3d);
   zPositionWrap.classList.toggle("is-hidden", !preset.is3d);
-  chargeCountWrap.classList.toggle("is-hidden", !preset.freeBuilder);
+  freeBuilderWrap.classList.toggle("is-hidden", !preset.freeBuilder);
   showAngles.closest("label").classList.toggle("is-hidden", !preset.is3d);
 
   syncViewOutputs();
+  syncFreeBuilderControls(preset);
 
   targetSelect.textContent = "";
   editChargeSelect.textContent = "";
@@ -647,10 +645,24 @@ function syncControlsFromState() {
     editOption.textContent = `Charge ${charge.label}`;
     editChargeSelect.append(editOption);
   });
-  targetSelect.value = String(state.targetIndex);
-  editChargeSelect.value = String(state.editIndex);
+  if (!state.charges.length) {
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = preset.freeBuilder ? "Add a charge first" : "No charges available";
+    targetSelect.append(placeholder);
 
-  chargeCountSelect.value = String(state.charges.length);
+    const editPlaceholder = document.createElement("option");
+    editPlaceholder.value = "";
+    editPlaceholder.textContent = "No charges available";
+    editChargeSelect.append(editPlaceholder);
+  }
+  targetSelect.disabled = !state.charges.length;
+  editChargeSelect.disabled = !state.charges.length;
+  if (state.charges.length) {
+    targetSelect.value = String(state.targetIndex);
+    editChargeSelect.value = String(state.editIndex);
+  }
+
   syncPositionEditor(edited, preset);
   syncChargeControls();
 }
@@ -692,7 +704,15 @@ function syncStringLengthControls() {
 }
 
 function syncPositionEditor(charge, preset) {
-  if (!charge) return;
+  if (!charge) {
+    xPositionInput.value = "0";
+    yPositionInput.value = "0";
+    zPositionInput.value = "0";
+    xPositionValue.value = "0";
+    yPositionValue.value = "0";
+    zPositionValue.value = "0";
+    return;
+  }
 
   xPositionInput.min = String(preset.world.minX);
   xPositionInput.max = String(preset.world.maxX);
@@ -719,10 +739,29 @@ function syncPositionEditor(charge, preset) {
   zPositionValue.value = formatFixed(charge.z, 1);
 }
 
+function syncFreeBuilderControls(preset) {
+  if (!preset.freeBuilder) return;
+  builderChargeValue.min = String(preset.chargeRange.min);
+  builderChargeValue.max = String(preset.chargeRange.max);
+  builderChargeValue.step = String(preset.chargeRange.step);
+  addChargeBtn.disabled = state.charges.length >= preset.maxCharges;
+  clearChargesBtn.disabled = !state.charges.length;
+}
+
 function renderChargeControls() {
   const preset = getPreset();
   chargeControlList.textContent = "";
   chargeControlRefs.length = 0;
+
+  if (!state.charges.length) {
+    const empty = document.createElement("p");
+    empty.className = "control-note";
+    empty.textContent = preset.freeBuilder
+      ? "No charges yet. Add a charge above, then choose which one to analyze."
+      : "No charges are currently available in this setup.";
+    chargeControlList.append(empty);
+    return;
+  }
 
   state.charges.forEach((charge, index) => {
     const row = document.createElement("label");
@@ -778,6 +817,17 @@ function renderChargeControls() {
 
     range.append(input, output);
     row.append(titleRow, range);
+
+    let removeBtn = null;
+    if (preset.freeBuilder) {
+      removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "ghost compact-action";
+      removeBtn.textContent = "Remove";
+      removeBtn.addEventListener("click", () => removeFreeCharge(index));
+      row.append(removeBtn);
+    }
+
     chargeControlList.append(row);
 
     chargeControlRefs.push({
@@ -786,6 +836,7 @@ function renderChargeControls() {
       meta,
       input,
       output,
+      removeBtn,
     });
   });
 }
@@ -821,10 +872,14 @@ function syncChargeControls() {
     if (document.activeElement !== refs.output) {
       refs.output.value = formatChargeControlValue(charge.value, preset);
     }
+    if (refs.removeBtn) {
+      refs.removeBtn.classList.toggle("is-hidden", !preset.freeBuilder);
+    }
   });
 }
 
 function onStateChanged() {
+  normalizeChargeSelection();
   state.practiceRevealed = state.activity !== "practice";
   state.practiceAnswers = {};
   state.feedback = "";
@@ -833,13 +888,23 @@ function onStateChanged() {
   renderAll();
 }
 
+function normalizeChargeSelection() {
+  if (!state.charges.length) {
+    state.targetIndex = 0;
+    state.editIndex = 0;
+    return;
+  }
+  state.targetIndex = clamp(state.targetIndex, 0, state.charges.length - 1);
+  state.editIndex = clamp(state.editIndex, 0, state.charges.length - 1);
+}
+
 function regeneratePractice() {
   state.practiceQuestions = buildPracticeQuestions(computeAnalysis());
   renderPracticeQuestions();
 }
 
 function buildPracticeQuestions(analysis) {
-  if (!analysis) return [];
+  if (!analysis || !analysis.target || !analysis.contributions.length) return [];
 
   const primary = analysis.strongestContribution || analysis.contributions[0];
   const directionOptions = analysis.preset.is3d
@@ -977,6 +1042,9 @@ function checkPracticeAnswers() {
 
 function computeAnalysis() {
   const preset = getPreset();
+  if (!state.charges.length || state.targetIndex < 0 || state.targetIndex >= state.charges.length) {
+    return buildEmptyAnalysis(preset);
+  }
   if (preset === PRESETS.equilibrium) {
     syncSharedPivotEquilibriumGeometry(preset);
   }
@@ -1060,6 +1128,26 @@ function computeAnalysis() {
   };
 }
 
+function buildEmptyAnalysis(preset) {
+  const massKg = preset === PRESETS.equilibrium ? (preset.massG ?? 1) / 1000 : state.massG / 1000;
+  return {
+    preset,
+    target: null,
+    contributions: [],
+    netFx: 0,
+    netFy: 0,
+    netFz: 0,
+    netMagnitude: 0,
+    azimuthDeg: 0,
+    elevationDeg: 0,
+    strongestContribution: null,
+    acceleration: 0,
+    directionLabel: "Near zero",
+    massKg,
+    equilibrium: null,
+  };
+}
+
 function renderAll() {
   syncControlsFromState();
   const analysis = computeAnalysis();
@@ -1071,6 +1159,21 @@ function renderAll() {
 
 function updateTextContent(analysis) {
   const preset = analysis.preset;
+  if (!analysis.target) {
+    statusLine.textContent = preset.freeBuilder
+      ? "Inquiry mode: add charges to the empty arena, then choose one as the target for analysis."
+      : "This setup currently has no target charge to analyze.";
+    presetPrompt.textContent = preset.prompt;
+    arenaPrompt.textContent = preset.freeBuilder
+      ? "Choose a charge value, add it to the arena, then drag charges into the layout you want."
+      : "Load a setup with at least one charge to begin.";
+    sceneCaption.textContent = preset.freeBuilder
+      ? `${preset.description} Add a charge with the builder controls, then drag charges on the canvas to refine the geometry.`
+      : preset.description;
+    formulaLine.textContent = preset.formulaNote;
+    teacherNote.textContent = `${preset.teacherUse} Source connection: ${preset.docRef}`;
+    return;
+  }
   const targetLabel = `charge ${analysis.target.label}`;
   const strongest = analysis.strongestContribution
     ? `The strongest current source is charge ${analysis.strongestContribution.source.label}.`
@@ -1094,13 +1197,15 @@ function updateTextContent(analysis) {
   sceneCaption.textContent = `${preset.description} ${
     preset.is3d
       ? "Use the yaw/pitch controls or drag empty space to rotate the scene, then scroll to zoom."
+      : preset.freeBuilder
+        ? "Add charges from the builder controls, then drag any existing charge to refine the layout."
       : "Drag a charge to change the separation r and watch the vector picture respond."
   }`;
   teacherNote.textContent = `${preset.teacherUse} Source connection: ${preset.docRef}`;
 
   if (preset === PRESETS.equilibrium) {
     formulaLine.textContent = analysis.equilibrium?.isBalanced
-      ? `${preset.formulaNote} Here the strings share one pivot, and equilibrium occurs when tension, weight, and electric force sum to zero. Current angle: ${formatFixed(
+      ? `${preset.formulaNote} Here the strings share one pivot, and each bob balances tension, weight, and the electric force along the line joining the charges. Current angle: ${formatFixed(
           analysis.equilibrium.thetaTargetDeg,
           1,
         )} deg.`
@@ -1122,7 +1227,9 @@ function renderMetrics(analysis) {
   const hideNumbers = state.activity === "practice" && !state.practiceRevealed;
   metricGrid.textContent = "";
 
-  const cards = hideNumbers
+  const cards = !analysis.target
+    ? buildEmptyMetricCards(analysis)
+    : hideNumbers
     ? [
         {
           title: "Setup",
@@ -1172,7 +1279,7 @@ function buildMetricCards(analysis) {
       value: formatForce(analysis.netMagnitude),
       note:
         preset === PRESETS.equilibrium
-          ? `Acts horizontally on the hanging charge. Direction: ${analysis.directionLabel.toLowerCase()}.`
+          ? `Acts along the line joining the charges. Direction: ${analysis.directionLabel.toLowerCase()}.`
           : `Direction: ${analysis.directionLabel.toLowerCase()}.`,
     },
     { title: "Fx", value: formatForce(analysis.netFx), note: "X component of the net force." },
@@ -1229,7 +1336,7 @@ function buildMetricCards(analysis) {
       title: "Equilibrium angle",
       value: analysis.equilibrium?.isBalanced ? `${formatFixed(theta, 1)} deg` : "No static balance",
       note: analysis.equilibrium?.isBalanced
-        ? "At equilibrium, the string tilts until tension cancels weight and electric force."
+        ? "At equilibrium, tension balances the combined weight and electric-force pull on that bob."
         : "Opposite-sign charges from the same pivot do not have a stable separated equilibrium.",
     });
   }
@@ -1245,9 +1352,42 @@ function buildMetricCards(analysis) {
   return cards;
 }
 
+function buildEmptyMetricCards(analysis) {
+  return [
+    {
+      title: "Setup",
+      value: analysis.preset.shortTitle,
+      note: analysis.preset.docRef,
+    },
+    {
+      title: analysis.preset.freeBuilder ? "Builder status" : "Status",
+      value: analysis.preset.freeBuilder ? "No charges yet" : "No target available",
+      note: analysis.preset.freeBuilder
+        ? "Add up to five charges, then choose one in Analyze charge."
+        : "This preset needs at least one charge before analysis can begin.",
+    },
+    {
+      title: "Current count",
+      value: `${state.charges.length} charges`,
+      note: analysis.preset.freeBuilder
+        ? "Use Add charge to place a positive or negative charge anywhere in the plane."
+        : "The arena is empty.",
+    },
+  ];
+}
+
 function renderForceTable(analysis) {
   const hideNumbers = state.activity === "practice" && !state.practiceRevealed;
   forceTableBody.textContent = "";
+
+  if (!analysis.target) {
+    appendTableMessage(
+      analysis.preset.freeBuilder
+        ? "Add at least one charge, then select a target to generate the force breakdown."
+        : "No target charge is available.",
+    );
+    return;
+  }
 
   if (hideNumbers) {
     appendTableMessage("Practice mode is hiding the quantitative breakdown. Press Check reasoning to reveal it.");
@@ -1505,10 +1645,10 @@ function drawForceVectors(projectedCharges, analysis, palette, width, height) {
   const maxMagnitude = Math.max(analysis.netMagnitude, ...analysis.contributions.map((item) => item.magnitude), 1e-30);
   const showContributionVectors = analysis.contributions.length > 1;
 
-  analysis.contributions.forEach((item) => {
+  analysis.contributions.forEach((item, index) => {
     if (!showContributionVectors) return;
     const length = mapMagnitude(item.magnitude, maxMagnitude, 34, analysis.preset.is3d ? 96 : 112);
-    const end = buildProjectedVectorEnd(
+    const baseEnd = buildProjectedVectorEnd(
       targetProjected.charge,
       { x: item.fx, y: item.fy, z: item.fz },
       item.magnitude,
@@ -1517,8 +1657,14 @@ function drawForceVectors(projectedCharges, analysis, palette, width, height) {
       height,
       length,
     );
-    drawArrow(targetProjected, end, palette.contribution, 3);
-    drawLabel(`F${item.source.label}`, end.x, end.y - 16, palette.labelBg, palette.labelText);
+    const { start, end, labelPoint } = buildDisplayOffsetVector(
+      targetProjected,
+      baseEnd,
+      index - (analysis.contributions.length - 1) / 2,
+      analysis.preset,
+    );
+    drawArrow(start, end, palette.contribution, 3);
+    drawLabel(`F${item.source.label}`, labelPoint.x, labelPoint.y, palette.labelBg, palette.labelText);
   });
 
   if (analysis.netMagnitude > 0) {
@@ -1750,6 +1896,24 @@ function drawCharges(projectedCharges, analysis, palette) {
 }
 
 function drawSceneAnnotations(projectedCharges, analysis, palette, width, height) {
+  if (!analysis.target) {
+    const emptyText = analysis.preset.freeBuilder
+      ? "Empty 2D builder: add a charge from the control panel."
+      : "No target charge available.";
+    drawLabel(emptyText, width / 2, height / 2 - 12, palette.labelBg, palette.labelText);
+    drawLabel(
+      analysis.preset.freeBuilder
+        ? "Then choose which charge to analyze and drag charges to reposition them."
+        : "Load or create a setup to begin.",
+      width / 2,
+      height / 2 + 18,
+      palette.labelBg,
+      palette.labelText,
+    );
+    drawLabel("Use the builder controls to place charges on the plane.", 18, height - 30, palette.labelBg, palette.labelText, "left");
+    return;
+  }
+
   const infoLines = [
     `Target: charge ${analysis.target.label}`,
     `${analysis.preset === PRESETS.equilibrium ? "Current electric force" : "Current net force"}: ${formatForce(analysis.netMagnitude)}`,
@@ -1781,6 +1945,8 @@ function drawSceneAnnotations(projectedCharges, analysis, palette, width, height
 
   const footerText = analysis.preset.is3d
     ? "Drag empty space to rotate. Click a charge to edit its 3D position."
+    : analysis.preset.freeBuilder
+      ? "Add a charge with the builder controls, then drag charges to reposition them."
     : analysis.preset === PRESETS.equilibrium
       ? "Use charge, mass, and string sliders to test the shared-pivot equilibrium."
       : "Drag a charge to change r";
@@ -2130,32 +2296,71 @@ function updateEditedChargePosition(axis, value) {
   onStateChanged();
 }
 
-function setFreeChargeCount(count) {
+function addFreeCharge() {
   const preset = getPreset();
   if (!preset.freeBuilder) return;
+  if (state.charges.length >= preset.maxCharges) return;
 
-  const nextCount = clamp(count, 2, preset.maxCharges);
-  const existing = cloneCharges(state.charges).slice(0, nextCount);
-  while (existing.length < nextCount) {
-    const label = CHARGE_LABELS[existing.length];
-    existing.push(
-      makeCharge(
-        label,
-        existing.length % 2 === 0 ? 3 : -3,
-        randomBetween(preset.world.minX * 0.7, preset.world.maxX * 0.7),
-        randomBetween(preset.world.minY * 0.7, preset.world.maxY * 0.7),
-        randomBetween(preset.world.minZ * 0.7, preset.world.maxZ * 0.7),
-        "xyz",
-      ),
-    );
+  const value = clampNumberInput(builderChargeValue, preset.chargeRange.min, preset.chargeRange.max, 3);
+  if (Math.abs(value) < Number(preset.chargeRange.step) / 2) {
+    builderChargeValue.value = formatChargeControlValue(3, preset);
+    return;
   }
 
-  state.charges = existing;
-  state.defaultCharges = cloneCharges(existing);
-  state.freeChargeCount = nextCount;
-  state.targetIndex = Math.min(state.targetIndex, nextCount - 1);
-  state.editIndex = Math.min(state.editIndex, nextCount - 1);
+  const label = nextFreeChargeLabel();
+  const spawn = nextFreeChargeSpawn(preset);
+  state.charges.push(makeCharge(label, value, spawn.x, spawn.y, 0, "xy"));
+  state.defaultCharges = cloneCharges(state.charges);
+  state.freeChargeCount = state.charges.length;
+  state.targetIndex = state.charges.length - 1;
+  state.editIndex = state.targetIndex;
   onStateChanged();
+}
+
+function removeFreeCharge(index) {
+  const preset = getPreset();
+  if (!preset.freeBuilder) return;
+  state.charges.splice(index, 1);
+  state.defaultCharges = cloneCharges(state.charges);
+  state.freeChargeCount = state.charges.length;
+  onStateChanged();
+}
+
+function clearFreeCharges() {
+  const preset = getPreset();
+  if (!preset.freeBuilder) return;
+  state.charges = [];
+  state.defaultCharges = [];
+  state.freeChargeCount = 0;
+  onStateChanged();
+}
+
+function nextFreeChargeLabel() {
+  const used = new Set(state.charges.map((charge) => charge.label));
+  return CHARGE_LABELS.find((label) => !used.has(label)) || `Q${state.charges.length + 1}`;
+}
+
+function nextFreeChargeSpawn(preset) {
+  const xSpan = preset.world.maxX - preset.world.minX;
+  const ySpan = preset.world.maxY - preset.world.minY;
+  const candidates = [
+    { x: -0.22 * xSpan, y: 0.18 * ySpan },
+    { x: 0.22 * xSpan, y: 0.18 * ySpan },
+    { x: -0.22 * xSpan, y: -0.18 * ySpan },
+    { x: 0.22 * xSpan, y: -0.18 * ySpan },
+    { x: 0, y: 0 },
+  ];
+
+  for (const candidate of candidates) {
+    if (state.charges.every((charge) => Math.hypot(charge.x - candidate.x, charge.y - candidate.y) > 0.9)) {
+      return candidate;
+    }
+  }
+
+  return {
+    x: clamp(randomBetween(preset.world.minX * 0.68, preset.world.maxX * 0.68), preset.world.minX + 0.4, preset.world.maxX - 0.4),
+    y: clamp(randomBetween(preset.world.minY * 0.68, preset.world.maxY * 0.68), preset.world.minY + 0.4, preset.world.maxY - 0.4),
+  };
 }
 
 function getPalette() {
@@ -2253,12 +2458,10 @@ function buildEquilibriumSummary(preset, contribution, massKg) {
     preset,
   );
   const thetaTarget = state.targetIndex === 0 ? solution.thetaA : solution.thetaB;
-  const electricForceN = contribution?.magnitude ?? 0;
+  const targetForce = solution.forceOnTarget || { x: contribution?.fx ?? 0, y: contribution?.fy ?? 0 };
+  const electricForceN = Math.hypot(targetForce.x, targetForce.y);
   const targetWeight = (state.chargeMassesG[state.targetIndex] ?? preset.massG) / 1000 * G;
-  const targetFx = Math.abs(contribution?.fx ?? 0);
-  const targetFy = contribution?.fy ?? 0;
-  const targetVertical = targetWeight - targetFy;
-  const tensionTargetN = Math.hypot(targetFx, targetVertical);
+  const tensionTargetN = solution.tensionOnTargetN ?? Math.hypot(targetForce.x, targetWeight + targetForce.y);
 
   return {
     isBalanced: solution.isBalanced,
@@ -2269,53 +2472,126 @@ function buildEquilibriumSummary(preset, contribution, massKg) {
     forceElectricN: electricForceN,
     weightTargetN: targetWeight,
     tensionTargetN,
+    residualN: solution.residualN,
+    forceOnTarget: targetForce,
   };
 }
 
 function solveSharedPivotEquilibriumAngles(chargeA, chargeB, massAkg, massBkg, stringLengthM, preset) {
   if (!chargeA || !chargeB || massAkg <= 0 || massBkg <= 0 || stringLengthM <= 0) {
-    return { thetaA: 0, thetaB: 0, isBalanced: false };
+    return { thetaA: 0, thetaB: 0, isBalanced: false, residualN: Infinity };
   }
 
   const qProduct = chargeA.value * chargeB.value;
   if (qProduct <= 0) {
-    return { thetaA: 0, thetaB: 0, isBalanced: false };
+    return { thetaA: 0, thetaB: 0, isBalanced: false, residualN: Infinity };
   }
 
   const qAbsProduct = Math.abs(chargeA.value * preset.chargeScale * chargeB.value * preset.chargeScale);
   if (qAbsProduct === 0) {
-    return { thetaA: 0, thetaB: 0, isBalanced: false };
+    return { thetaA: 0, thetaB: 0, isBalanced: false, residualN: Infinity };
   }
 
   let thetaA = 0.24;
   let thetaB = 0.24;
+  let stateVector = evaluateSharedPivotEquilibrium(thetaA, thetaB, qAbsProduct, massAkg, massBkg, stringLengthM, preset);
 
-  for (let index = 0; index < 80; index += 1) {
-    const ax = -stringLengthM * Math.sin(thetaA);
-    const ay = -stringLengthM * Math.cos(thetaA);
-    const bx = stringLengthM * Math.sin(thetaB);
-    const by = -stringLengthM * Math.cos(thetaB);
-    const rx = bx - ax;
-    const ry = by - ay;
-    const r = Math.max(Math.hypot(rx, ry), preset.softening);
-    const force = K * qAbsProduct / (r * r);
-    const fx = force * (rx / r);
-    const fy = force * (ry / r);
-
-    const nextThetaA = clamp(Math.atan2(Math.abs(fx), Math.max(1e-9, massAkg * G + fy)), 0, Math.PI / 2 - 0.01);
-    const nextThetaB = clamp(Math.atan2(Math.abs(fx), Math.max(1e-9, massBkg * G - fy)), 0, Math.PI / 2 - 0.01);
-
-    if (Math.abs(nextThetaA - thetaA) < 1e-6 && Math.abs(nextThetaB - thetaB) < 1e-6) {
-      thetaA = nextThetaA;
-      thetaB = nextThetaB;
+  for (let index = 0; index < 40; index += 1) {
+    const residual = Math.hypot(stateVector.tangentA, stateVector.tangentB);
+    if (residual < 1e-8) {
       break;
     }
 
-    thetaA = thetaA * 0.55 + nextThetaA * 0.45;
-    thetaB = thetaB * 0.55 + nextThetaB * 0.45;
+    const step = 1e-4;
+    const jacA = evaluateSharedPivotEquilibrium(
+      clamp(thetaA + step, 1e-4, Math.PI / 2 - 0.01),
+      thetaB,
+      qAbsProduct,
+      massAkg,
+      massBkg,
+      stringLengthM,
+      preset,
+    );
+    const jacB = evaluateSharedPivotEquilibrium(
+      thetaA,
+      clamp(thetaB + step, 1e-4, Math.PI / 2 - 0.01),
+      qAbsProduct,
+      massAkg,
+      massBkg,
+      stringLengthM,
+      preset,
+    );
+    const j11 = (jacA.tangentA - stateVector.tangentA) / step;
+    const j21 = (jacA.tangentB - stateVector.tangentB) / step;
+    const j12 = (jacB.tangentA - stateVector.tangentA) / step;
+    const j22 = (jacB.tangentB - stateVector.tangentB) / step;
+    const det = j11 * j22 - j12 * j21;
+
+    if (Math.abs(det) < 1e-12) {
+      break;
+    }
+
+    const deltaA = (-stateVector.tangentA * j22 + j12 * stateVector.tangentB) / det;
+    const deltaB = (j21 * stateVector.tangentA - j11 * stateVector.tangentB) / det;
+
+    let nextThetaA = clamp(thetaA + deltaA, 1e-4, Math.PI / 2 - 0.01);
+    let nextThetaB = clamp(thetaB + deltaB, 1e-4, Math.PI / 2 - 0.01);
+    let nextState = evaluateSharedPivotEquilibrium(nextThetaA, nextThetaB, qAbsProduct, massAkg, massBkg, stringLengthM, preset);
+    let nextResidual = Math.hypot(nextState.tangentA, nextState.tangentB);
+    let damping = 0;
+
+    while (nextResidual > residual && damping < 6) {
+      nextThetaA = clamp((thetaA + nextThetaA) / 2, 1e-4, Math.PI / 2 - 0.01);
+      nextThetaB = clamp((thetaB + nextThetaB) / 2, 1e-4, Math.PI / 2 - 0.01);
+      nextState = evaluateSharedPivotEquilibrium(nextThetaA, nextThetaB, qAbsProduct, massAkg, massBkg, stringLengthM, preset);
+      nextResidual = Math.hypot(nextState.tangentA, nextState.tangentB);
+      damping += 1;
+    }
+
+    thetaA = nextThetaA;
+    thetaB = nextThetaB;
+    stateVector = nextState;
   }
 
-  return { thetaA, thetaB, isBalanced: true };
+  const finalResidual = Math.hypot(stateVector.tangentA, stateVector.tangentB);
+  return {
+    thetaA,
+    thetaB,
+    isBalanced: finalResidual < 5e-6,
+    residualN: finalResidual,
+    forceOnTarget: stateVector.forceOnB,
+    tensionOnTargetN: stateVector.tensionOnB,
+  };
+}
+
+function evaluateSharedPivotEquilibrium(thetaA, thetaB, qAbsProduct, massAkg, massBkg, stringLengthM, preset) {
+  const ax = -stringLengthM * Math.sin(thetaA);
+  const ay = -stringLengthM * Math.cos(thetaA);
+  const bx = stringLengthM * Math.sin(thetaB);
+  const by = -stringLengthM * Math.cos(thetaB);
+  const rx = ax - bx;
+  const ry = ay - by;
+  const r = Math.max(Math.hypot(rx, ry), preset.softening);
+  const forceScale = K * qAbsProduct / Math.pow(r, 3);
+  const forceOnA = { x: forceScale * rx, y: forceScale * ry };
+  const forceOnB = { x: -forceOnA.x, y: -forceOnA.y };
+  const tangentA = { x: -Math.cos(thetaA), y: Math.sin(thetaA) };
+  const tangentB = { x: Math.cos(thetaB), y: Math.sin(thetaB) };
+  const radialA = { x: Math.sin(thetaA), y: Math.cos(thetaA) };
+  const radialB = { x: -Math.sin(thetaB), y: Math.cos(thetaB) };
+  const weightA = { x: 0, y: -massAkg * G };
+  const weightB = { x: 0, y: -massBkg * G };
+  const netWithoutTensionA = { x: forceOnA.x + weightA.x, y: forceOnA.y + weightA.y };
+  const netWithoutTensionB = { x: forceOnB.x + weightB.x, y: forceOnB.y + weightB.y };
+
+  return {
+    tangentA: dot(netWithoutTensionA, tangentA),
+    tangentB: dot(netWithoutTensionB, tangentB),
+    forceOnA,
+    forceOnB,
+    tensionOnA: Math.max(0, -dot(netWithoutTensionA, radialA)),
+    tensionOnB: Math.max(0, -dot(netWithoutTensionB, radialB)),
+  };
 }
 
 function shouldDrawComponents(analysis) {
@@ -2373,6 +2649,10 @@ function capitalize(text) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function dot(a, b) {
+  return a.x * b.x + a.y * b.y;
 }
 
 function randomBetween(min, max) {
@@ -2433,6 +2713,11 @@ function buildProjectedVectorEnd(originCharge, vector, magnitude, preset, width,
   const start = projectCharge(originCharge, preset, width, height);
   if (!magnitude || magnitude <= 0) return { x: start.x, y: start.y };
 
+  if (!preset.is3d) {
+    const dimensions = getWorldToCanvasScale(preset, width, height);
+    return buildScreenVectorEnd(start, vector, magnitude, dimensions, targetLength);
+  }
+
   const probeLength = maxWorldSpan(preset) * 0.18;
   const unit = normalizeVector(vector);
   const probe = projectWorldPoint(
@@ -2450,6 +2735,25 @@ function buildProjectedVectorEnd(originCharge, vector, magnitude, preset, width,
   const dy = probe.y - start.y;
   const scale = targetLength / (Math.hypot(dx, dy) || 1);
   return { x: start.x + dx * scale, y: start.y + dy * scale };
+}
+
+function buildDisplayOffsetVector(start, end, slot, preset) {
+  if (preset.is3d) {
+    return {
+      start,
+      end,
+      labelPoint: offsetPointFromSegment(start, end, 0.64, 18),
+    };
+  }
+
+  const normalOffset = 18 + Math.abs(slot) * 10;
+  const signedOffset = Math.abs(slot) < 1e-6 ? 18 : Math.sign(slot) * normalOffset;
+
+  return {
+    start,
+    end,
+    labelPoint: offsetPointFromSegment(start, end, 0.64, signedOffset),
+  };
 }
 
 function scaleVectorToLength(vector, targetLength) {

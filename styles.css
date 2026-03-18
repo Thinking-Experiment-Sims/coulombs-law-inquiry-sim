@@ -340,6 +340,21 @@ label {
   letter-spacing: 0.06em;
 }
 
+.builder-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.builder-grid-compact {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 13rem;
+}
+
+.builder-actions {
+  margin-top: 0.7rem;
+}
+
 .range-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 5.75rem;
@@ -390,6 +405,13 @@ button:hover {
   transform: translateY(-1px);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  filter: none;
+}
+
 button.ghost {
   background: rgba(200, 162, 74, 0.11);
   color: var(--text-100);
@@ -431,6 +453,12 @@ canvas:focus-visible {
 .button-row button {
   flex: 1 1 0;
   min-width: 0;
+}
+
+.compact-action {
+  align-self: flex-start;
+  margin-top: 0.1rem;
+  padding: 0.45rem 0.7rem;
 }
 
 .compact-toggle {
@@ -731,6 +759,10 @@ body.practice-mode .practice-card {
   .controls-grid,
   .inquiry-grid,
   .help-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .builder-grid {
     grid-template-columns: 1fr;
   }
 
