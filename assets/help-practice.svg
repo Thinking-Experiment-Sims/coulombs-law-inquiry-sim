@@ -1,0 +1,21 @@
+<svg width="1280" height="760" viewBox="0 0 1280 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="760" rx="28" fill="#F8FCFF"/>
+  <rect x="42" y="42" width="1196" height="676" rx="24" fill="#FFFFFF" stroke="#C8DBE3" stroke-width="2"/>
+  <rect x="78" y="90" width="520" height="92" rx="20" fill="#F6FBFD" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="110" y="132" fill="#123140" font-size="24" font-family="Arial, sans-serif" font-weight="700">Practice mode hides the breakdown table.</text>
+  <text x="110" y="166" fill="#4B6570" font-size="18" font-family="Arial, sans-serif">Students must answer the concept checks before the numbers appear.</text>
+  <rect x="78" y="220" width="520" height="400" rx="22" fill="#EDF7FB" stroke="#C8DBE3" stroke-width="2"/>
+  <rect x="118" y="262" width="440" height="70" rx="16" fill="#FFFFFF" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="144" y="307" fill="#123140" font-size="22" font-family="Arial, sans-serif" font-weight="700">The net force on the target points mostly...</text>
+  <rect x="118" y="360" width="440" height="70" rx="16" fill="#FFFFFF" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="144" y="405" fill="#123140" font-size="22" font-family="Arial, sans-serif" font-weight="700">Which source contributes the most?</text>
+  <rect x="118" y="458" width="440" height="70" rx="16" fill="#FFFFFF" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="144" y="503" fill="#123140" font-size="22" font-family="Arial, sans-serif" font-weight="700">How should the force change if r doubles?</text>
+  <rect x="700" y="142" width="462" height="120" rx="20" fill="#FFF4DD" stroke="#D67B19" stroke-width="2"/>
+  <text x="734" y="192" fill="#9A5D00" font-size="24" font-family="Arial, sans-serif" font-weight="700">Teacher move</text>
+  <text x="734" y="228" fill="#123140" font-size="20" font-family="Arial, sans-serif">Ask students to defend the sign and direction before they touch the table.</text>
+  <rect x="700" y="300" width="462" height="250" rx="22" fill="#F6FBFD" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="734" y="350" fill="#123140" font-size="24" font-family="Arial, sans-serif" font-weight="700">Why this matters</text>
+  <text x="734" y="392" fill="#4B6570" font-size="20" font-family="Arial, sans-serif">Practice mode keeps the simulation from turning into an answer extractor.</text>
+  <text x="734" y="430" fill="#4B6570" font-size="20" font-family="Arial, sans-serif">Students first commit to a qualitative claim, then check that claim with the math.</text>
+</svg>

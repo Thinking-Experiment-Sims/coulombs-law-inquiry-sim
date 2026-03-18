@@ -1,0 +1,31 @@
+<svg width="1280" height="760" viewBox="0 0 1280 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="760" rx="28" fill="#F8FCFF"/>
+  <rect x="36" y="36" width="1208" height="688" rx="24" fill="#EDF7FB" stroke="#C8DBE3" stroke-width="2"/>
+  <g stroke="#C8DBE3" stroke-width="2" opacity="0.7">
+    <path d="M140 90V686"/><path d="M340 90V686"/><path d="M540 90V686"/><path d="M740 90V686"/><path d="M940 90V686"/><path d="M1140 90V686"/>
+    <path d="M74 180H1206"/><path d="M74 320H1206"/><path d="M74 460H1206"/><path d="M74 600H1206"/>
+  </g>
+  <path d="M310 520L868 220" stroke="#9DBAC5" stroke-width="5" stroke-dasharray="14 14"/>
+  <rect x="534" y="332" width="136" height="54" rx="18" fill="white"/>
+  <text x="567" y="367" fill="#123140" font-size="22" font-family="Arial, sans-serif" font-weight="700">distance r</text>
+  <circle cx="310" cy="520" r="42" fill="#D67B19" stroke="#123140" stroke-width="10"/>
+  <text x="296" y="534" fill="white" font-size="40" font-family="Arial, sans-serif" font-weight="700">+</text>
+  <circle cx="868" cy="220" r="34" fill="#0F7E9B" stroke="#9DBAC5" stroke-width="8"/>
+  <text x="857" y="232" fill="white" font-size="34" font-family="Arial, sans-serif" font-weight="700">-</text>
+  <path d="M310 520L620 352" stroke="#C8A24A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M620 352L590 352L606 326" fill="#C8A24A"/>
+  <rect x="548" y="272" width="164" height="52" rx="16" fill="white"/>
+  <text x="575" y="305" fill="#123140" font-size="24" font-family="Arial, sans-serif" font-weight="700">contribution</text>
+  <path d="M310 520L650 292" stroke="#7E5AF0" stroke-width="12" stroke-linecap="round"/>
+  <path d="M650 292L618 298L636 268" fill="#7E5AF0"/>
+  <rect x="658" y="236" width="110" height="50" rx="16" fill="white"/>
+  <text x="686" y="269" fill="#123140" font-size="24" font-family="Arial, sans-serif" font-weight="700">Fnet</text>
+  <path d="M310 520L650 520" stroke="#95B8C6" stroke-width="4" stroke-dasharray="12 10"/>
+  <path d="M650 520L650 292" stroke="#95B8C6" stroke-width="4" stroke-dasharray="12 10"/>
+  <rect x="436" y="540" width="70" height="46" rx="14" fill="white"/>
+  <text x="456" y="570" fill="#123140" font-size="24" font-family="Arial, sans-serif" font-weight="700">Fx</text>
+  <rect x="674" y="398" width="70" height="46" rx="14" fill="white"/>
+  <text x="694" y="428" fill="#123140" font-size="24" font-family="Arial, sans-serif" font-weight="700">Fy</text>
+  <rect x="84" y="78" width="380" height="50" rx="16" fill="white"/>
+  <text x="110" y="111" fill="#123140" font-size="24" font-family="Arial, sans-serif" font-weight="700">Read the picture in this order: source force, net force, then Fx and Fy.</text>
+</svg>

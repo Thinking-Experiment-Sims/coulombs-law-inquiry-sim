@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coulomb's Law Inquiry Lab | The Thinking Experiment</title>
+    <meta
+      name="description"
+      content="Inquiry-based Coulomb's law simulation with multiple charge setups, superposition practice, and teacher demo presets."
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://vladimirlopez.github.io/the-thinking-experiment/assets/favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="https://vladimirlopez.github.io/the-thinking-experiment/assets/favicon-16.png"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <header class="hero shell">
+      <div class="hero-top">
+        <div class="hero-copy">
+          <p class="kicker">The Thinking Experiment</p>
+          <h1>Coulomb's Law Inquiry Lab</h1>
+          <p class="subtitle">
+            Drag charges, compare force vectors, and use teacher-ready presets to move from qualitative predictions to
+            superposition, components, and equilibrium reasoning.
+          </p>
+          <div class="hero-pills" aria-label="Simulation features">
+            <span>Inquiry first</span>
+            <span>Practice mode</span>
+            <span>Teacher demo presets</span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button id="studentHelpBtn" class="ghost hero-utility" type="button">Student Help</button>
+          <button id="teacherGuideBtn" class="ghost hero-utility" type="button">Teacher's Guide</button>
+          <button id="themeToggleBtn" class="display-toggle" type="button">Light mode</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell app-layout">
+      <section class="panel full">
+        <div class="orientation-head">
+          <div>
+            <h2>Investigation Flow</h2>
+            <p class="hint">Keep the physics sequence tight: predict, test, then explain with the representation below.</p>
+          </div>
+          <p id="presetPrompt" class="hint orientation-prompt"></p>
+        </div>
+        <div class="inquiry-grid">
+          <article class="inquiry-card">
+            <h3>1. Predict</h3>
+            <p>
+              Choose a setup, decide whether the interaction should attract or repel, and estimate which force contribution
+              should dominate.
+            </p>
+          </article>
+          <article class="inquiry-card">
+            <h3>2. Test</h3>
+            <p>
+              Drag the charges, change the charge values, and watch the force vectors and readouts update in real time.
+            </p>
+          </article>
+          <article class="inquiry-card">
+            <h3>3. Explain</h3>
+            <p>
+              Use the breakdown table to justify your claim with superposition, component reasoning, or equilibrium ideas.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel wide">
+        <div class="panel-top">
+          <div>
+            <h2>Electrostatic Arena</h2>
+            <p id="statusLine" class="hint" role="status">
+              Choose a setup, then drag a charge or adjust the sliders to test a prediction.
+            </p>
+          </div>
+          <div class="arena-focus">
+            <p class="focus-label">Current prompt</p>
+            <p id="arenaPrompt" class="focus-text"></p>
+          </div>
+        </div>
+
+        <canvas id="simCanvas" class="sim-canvas" width="1200" height="620" aria-label="Coulomb's law simulation"></canvas>
+
+        <div class="canvas-foot">
+          <p id="sceneCaption" class="hint"></p>
+          <p id="formulaLine" class="hint"></p>
+        </div>
+      </section>
+
+      <section class="panel narrow">
+        <h2>Controls</h2>
+        <div class="controls-grid">
+          <label class="control-span-2">
+            Scenario
+            <select id="presetSelect"></select>
+          </label>
+
+          <label>
+            Activity mode
+            <select id="activityMode">
+              <option value="inquiry">Inquiry lab</option>
+              <option value="practice">Practice mode</option>
+            </select>
+          </label>
+
+          <label>
+            Analyze charge
+            <select id="targetSelect"></select>
+          </label>
+
+          <label>
+            Target mass (g)
+            <div class="range-row">
+              <input id="massInput" type="range" min="0.1" max="10.0" step="0.1" value="1.0" />
+              <output id="massValue">1.0</output>
+            </div>
+          </label>
+
+          <label id="stringLengthWrap" class="control-span-2">
+            String length (cm)
+            <div class="range-row">
+              <input id="stringLengthInput" type="range" min="10" max="100" step="1" value="40" />
+              <output id="stringLengthValue">40</output>
+            </div>
+            <span class="control-note">Used only for the suspended-spheres style equilibrium bridge.</span>
+          </label>
+
+          <label>
+            <span id="qALabel">Charge A</span>
+            <div class="range-row">
+              <input id="qA" type="range" min="-8" max="8" step="0.1" value="4.5" />
+              <output id="qAValue">4.5</output>
+            </div>
+          </label>
+
+          <label>
+            <span id="qBLabel">Charge B</span>
+            <div class="range-row">
+              <input id="qB" type="range" min="-8" max="8" step="0.1" value="-3.0" />
+              <output id="qBValue">-3.0</output>
+            </div>
+          </label>
+
+          <label id="qCWrap">
+            <span id="qCLabel">Charge C</span>
+            <div class="range-row">
+              <input id="qC" type="range" min="-8" max="8" step="0.1" value="2.0" />
+              <output id="qCValue">2.0</output>
+            </div>
+          </label>
+
+          <label class="compact-toggle control-span-2">
+            <input id="showVectors" type="checkbox" checked />
+            Show force vectors
+          </label>
+
+          <label class="compact-toggle control-span-2">
+            <input id="showComponents" type="checkbox" checked />
+            Show components and helper lines
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="randomizeBtn" type="button">New challenge</button>
+          <button id="resetBtn" type="button" class="ghost">Reset setup</button>
+        </div>
+
+        <section id="practiceCard" class="practice-card">
+          <div class="practice-head">
+            <h3>Practice Check</h3>
+            <span class="practice-chip">Auto-refreshes with the setup</span>
+          </div>
+          <p id="practicePrompt" class="hint"></p>
+          <div id="questionGrid" class="question-grid"></div>
+          <div class="button-row">
+            <button id="checkAnswersBtn" type="button">Check reasoning</button>
+          </div>
+          <p id="feedbackLine" class="hint"></p>
+        </section>
+      </section>
+
+      <section class="panel full">
+        <div class="analysis-head">
+          <div>
+            <h2>Observe And Explain</h2>
+            <p class="hint">
+              Keep the math close to the picture: identify each contribution, compare directions, then use the table to
+              justify the net result.
+            </p>
+          </div>
+          <div class="legend-row" aria-label="Vector legend">
+            <span class="legend positive">Positive charge</span>
+            <span class="legend negative">Negative charge</span>
+            <span class="legend target">Target charge</span>
+            <span class="legend contribution">Contribution vector</span>
+            <span class="legend net">Net force</span>
+            <span class="legend component">Fx / Fy guides</span>
+          </div>
+        </div>
+
+        <div id="metricGrid" class="metric-strip"></div>
+
+        <div class="table-wrap compact-table">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Source</th>
+                <th scope="col">Distance</th>
+                <th scope="col">Interaction</th>
+                <th scope="col">Fx (N)</th>
+                <th scope="col">Fy (N)</th>
+                <th scope="col">|F| (N)</th>
+              </tr>
+            </thead>
+            <tbody id="forceTableBody"></tbody>
+          </table>
+        </div>
+
+        <p id="teacherNote" class="hint analysis-foot"></p>
+      </section>
+    </main>
+
+    <dialog id="teacherGuideDialog" class="help-dialog" aria-labelledby="helpTitle">
+      <div class="help-shell">
+        <div class="help-head">
+          <div>
+            <p class="kicker">Simulation Guide</p>
+            <h2 id="helpTitle">Teacher's Guide To Coulomb's Law Inquiry Lab</h2>
+            <p class="hint">
+              Use this guide when introducing the simulation, reviewing vector meaning, or assigning independent inquiry work.
+            </p>
+          </div>
+          <button id="closeTeacherGuideBtn" class="ghost" type="button">Close</button>
+        </div>
+
+        <div class="help-grid">
+          <section class="help-card">
+            <h3>1. Start With The Scenario</h3>
+            <img src="./assets/help-overview.svg" alt="Annotated overview showing the scenario dropdown, arena, and analysis sections." />
+            <p>
+              Pick a scenario from the dropdown first. Each scenario changes the geometry, units, and the kind of reasoning
+              students should use.
+            </p>
+            <ul class="help-list">
+              <li><strong>Two Charges:</strong> sign logic, attraction vs repulsion, inverse-square changes.</li>
+              <li><strong>Three on a Line:</strong> superposition in one dimension.</li>
+              <li><strong>2D Triangle:</strong> net force from components.</li>
+              <li><strong>U-235 Fission:</strong> tiny distance, huge force.</li>
+              <li><strong>Equilibrium Bridge:</strong> connect electric force to force balance.</li>
+            </ul>
+          </section>
+
+          <section class="help-card">
+            <h3>2. Read The Vectors Correctly</h3>
+            <img src="./assets/help-vectors.svg" alt="Annotated vector screenshot showing the contribution vector, net vector, and Fx and Fy component guides." />
+            <p>
+              The arrows have different jobs. Students should say what each one means before looking at the table.
+            </p>
+            <ul class="help-list">
+              <li><strong>Gold arrows:</strong> individual force contributions from source charges on the target.</li>
+              <li><strong>Purple arrow:</strong> the net force after adding all contributions.</li>
+              <li><strong>Dashed Fx and Fy guides:</strong> the horizontal and vertical parts of the net vector.</li>
+              <li><strong>Distance line:</strong> shows the separation used in Coulomb's law.</li>
+            </ul>
+          </section>
+
+          <section class="help-card">
+            <h3>3. Inquiry Workflow</h3>
+            <p>
+              Use the simulation as a PER tool, not a calculator. Ask students to commit to a claim before they read the
+              numbers.
+            </p>
+            <ol class="help-list ordered">
+              <li>Choose the target charge and identify the source charges acting on it.</li>
+              <li>Predict the direction of each force contribution using sign logic.</li>
+              <li>Change charge magnitude or position and test the prediction.</li>
+              <li>Only then use the breakdown table to explain the net result with evidence.</li>
+            </ol>
+          </section>
+
+          <section class="help-card">
+            <h3>4. When To Show Components</h3>
+            <p>
+              Components are most helpful in two-dimensional setups. In one-dimensional cases, they add clutter without
+              improving understanding.
+            </p>
+            <ul class="help-list">
+              <li>Turn <strong>Show force vectors</strong> on whenever students are comparing directions.</li>
+              <li>Turn <strong>Show components and helper lines</strong> on when the net force has both x and y parts.</li>
+              <li>For line or equilibrium scenarios, focus students on left/right reasoning and the force table.</li>
+            </ul>
+          </section>
+
+          <section class="help-card">
+            <h3>5. Practice Mode</h3>
+            <img src="./assets/help-practice.svg" alt="Annotated practice mode screenshot showing hidden quantitative readouts and concept questions." />
+            <p>
+              Practice mode hides the quantitative breakdown until students answer the conceptual prompts. This keeps the
+              activity inquiry-based instead of answer-hunting.
+            </p>
+          </section>
+
+          <section class="help-card">
+            <h3>6. Teacher Moves</h3>
+            <ul class="help-list">
+              <li>Ask “Which force is stronger and why?” before asking for a number.</li>
+              <li>Use the 2D Triangle case when students are ready to add vectors by components.</li>
+              <li>Use Equilibrium Bridge after Coulomb's law to connect electrostatics to force-balance problems.</li>
+              <li>Use U-235 Fission to show that the same equation behaves dramatically at tiny scales.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="studentHelpDialog" class="help-dialog" aria-labelledby="studentHelpTitle">
+      <div class="help-shell">
+        <div class="help-head">
+          <div>
+            <p class="kicker">Student Guide</p>
+            <h2 id="studentHelpTitle">How Students Should Use The Simulation</h2>
+            <p class="hint">Use this when you get stuck or need a reminder about what each arrow and control means.</p>
+          </div>
+          <button id="closeStudentHelpBtn" class="ghost" type="button">Close</button>
+        </div>
+
+        <div class="help-grid">
+          <section class="help-card">
+            <h3>1. Pick The Scenario</h3>
+            <img src="./assets/help-overview.svg" alt="Overview of the scenario menu, arena, and analysis sections." />
+            <p>Start by choosing the scenario your class is working on. Different scenarios are designed for different problem types.</p>
+          </section>
+
+          <section class="help-card">
+            <h3>2. Read The Picture</h3>
+            <img src="./assets/help-vectors.svg" alt="Vector screenshot showing contribution vectors, the net vector, and component guides." />
+            <ul class="help-list">
+              <li><strong>Charge colors</strong> tell you whether the charge is positive or negative.</li>
+              <li><strong>Gold force arrows</strong> are individual force contributions on the target.</li>
+              <li><strong>Purple arrow</strong> is the net force after adding all contributions.</li>
+              <li><strong>Fx and Fy guides</strong> break the net force into components when that helps.</li>
+            </ul>
+          </section>
+
+          <section class="help-card">
+            <h3>3. Use The Inquiry Routine</h3>
+            <ol class="help-list ordered">
+              <li>Predict the direction of the force before changing anything.</li>
+              <li>Drag charges or change values to test the prediction.</li>
+              <li>Use the table and metric cards only after you have a claim.</li>
+              <li>In practice mode, answer the questions before the numbers appear.</li>
+            </ol>
+          </section>
+
+          <section class="help-card">
+            <h3>4. Special Note For Suspended Spheres</h3>
+            <p>
+              In the equilibrium scenario, look for the strings, tension, weight, the electric force, and the angle. That
+              scenario is about force balance, not just Coulomb's law by itself.
+            </p>
+          </section>
+        </div>
+      </div>
+    </dialog>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

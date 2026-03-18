@@ -1,0 +1,26 @@
+<svg width="1280" height="760" viewBox="0 0 1280 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="760" rx="28" fill="#EEF6FA"/>
+  <rect x="28" y="26" width="1224" height="88" rx="22" fill="#FFFFFF" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="54" y="70" fill="#123140" font-size="22" font-family="Arial, sans-serif" font-weight="700">1. Choose a scenario from the dropdown.</text>
+  <rect x="848" y="44" width="336" height="48" rx="14" fill="#F7FBFD" stroke="#9DBAC5" stroke-width="2"/>
+  <text x="872" y="74" fill="#123140" font-size="18" font-family="Arial, sans-serif">Two-Charge Force Lab</text>
+  <rect x="28" y="138" width="784" height="504" rx="24" fill="#F8FCFF" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="58" y="180" fill="#123140" font-size="22" font-family="Arial, sans-serif" font-weight="700">2. Use the arena to drag charges and compare arrows.</text>
+  <rect x="68" y="212" width="700" height="380" rx="20" fill="#EAF4F9" stroke="#C8DBE3" stroke-width="2"/>
+  <path d="M128 522L316 374" stroke="#C8DBE3" stroke-width="5" stroke-dasharray="12 12"/>
+  <circle cx="130" cy="524" r="34" fill="#D67B19" stroke="#123140" stroke-width="8"/>
+  <text x="118" y="536" fill="white" font-size="34" font-family="Arial, sans-serif" font-weight="700">+</text>
+  <circle cx="316" cy="374" r="28" fill="#0F7E9B" stroke="#9DBAC5" stroke-width="6"/>
+  <text x="307" y="384" fill="white" font-size="30" font-family="Arial, sans-serif" font-weight="700">-</text>
+  <path d="M130 524L260 420" stroke="#7E5AF0" stroke-width="10" stroke-linecap="round"/>
+  <path d="M260 420L236 424L248 396" fill="#7E5AF0"/>
+  <rect x="838" y="138" width="414" height="504" rx="24" fill="#FFFFFF" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="868" y="182" fill="#123140" font-size="22" font-family="Arial, sans-serif" font-weight="700">3. Use controls to adjust the case.</text>
+  <rect x="868" y="220" width="354" height="74" rx="18" fill="#F6FBFD" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="892" y="264" fill="#123140" font-size="18" font-family="Arial, sans-serif">Target charge, mass, and charge sliders</text>
+  <rect x="868" y="318" width="354" height="120" rx="18" fill="#F6FBFD" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="892" y="362" fill="#123140" font-size="18" font-family="Arial, sans-serif">Toggle vectors and components.</text>
+  <text x="892" y="394" fill="#4B6570" font-size="16" font-family="Arial, sans-serif">Practice mode hides the table until students commit.</text>
+  <rect x="28" y="664" width="1224" height="68" rx="20" fill="#FFFFFF" stroke="#C8DBE3" stroke-width="2"/>
+  <text x="54" y="707" fill="#123140" font-size="21" font-family="Arial, sans-serif" font-weight="700">4. Finish in the Observe and Explain section to connect the picture to the math.</text>
+</svg>
