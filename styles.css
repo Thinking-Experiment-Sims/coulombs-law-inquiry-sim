@@ -297,11 +297,64 @@ label {
   color: var(--text-500);
 }
 
+.control-stack-head h3 {
+  font-size: 0.95rem;
+}
+
+.charge-editor {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: var(--surface-alt);
+}
+
+.charge-control-list {
+  margin-top: 0.7rem;
+  display: grid;
+  gap: 0.65rem;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 0.2rem;
+}
+
+.charge-control {
+  gap: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 0.7rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.charge-control-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.86rem;
+}
+
+.charge-control-head span:last-child {
+  color: var(--text-500);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .range-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) 5.75rem;
   align-items: center;
   gap: 0.55rem;
+}
+
+.range-row > input[type="range"] {
+  width: 100%;
+  min-width: 0;
+}
+
+.range-row > input[type="number"] {
+  width: 5.75rem;
+  text-align: right;
 }
 
 input,
