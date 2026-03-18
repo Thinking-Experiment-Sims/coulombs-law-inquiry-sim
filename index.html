@@ -32,11 +32,12 @@
           <h1>Coulomb's Law Inquiry Lab</h1>
           <p class="subtitle">
             Drag charges, compare force vectors, and use teacher-ready presets to move from qualitative predictions to
-            superposition, components, and equilibrium reasoning.
+            superposition, components, 3D spatial reasoning, and equilibrium reasoning.
           </p>
           <div class="hero-pills" aria-label="Simulation features">
             <span>Inquiry first</span>
             <span>Practice mode</span>
+            <span>3D structures</span>
             <span>Teacher demo presets</span>
           </div>
         </div>
@@ -123,11 +124,43 @@
             <select id="targetSelect"></select>
           </label>
 
-          <label>
+          <label id="massWrap">
             Target mass (g)
             <div class="range-row">
               <input id="massInput" type="range" min="0.1" max="10.0" step="0.1" value="1.0" />
-              <output id="massValue">1.0</output>
+              <input id="massValue" type="number" min="0.1" max="10.0" step="0.1" value="1.0" />
+            </div>
+          </label>
+
+          <label id="massAWrap">
+            Mass A (g)
+            <div class="range-row">
+              <input id="massAInput" type="range" min="0.1" max="10.0" step="0.1" value="1.0" />
+              <input id="massAValue" type="number" min="0.1" max="10.0" step="0.1" value="1.0" />
+            </div>
+          </label>
+
+          <label id="massBWrap">
+            Mass B (g)
+            <div class="range-row">
+              <input id="massBInput" type="range" min="0.1" max="10.0" step="0.1" value="1.0" />
+              <input id="massBValue" type="number" min="0.1" max="10.0" step="0.1" value="1.0" />
+            </div>
+          </label>
+
+          <label id="viewYawWrap">
+            View yaw (deg)
+            <div class="range-row">
+              <input id="viewYawInput" type="range" min="-180" max="180" step="1" value="-28" />
+              <input id="viewYawValue" type="number" min="-180" max="180" step="1" value="-28" />
+            </div>
+          </label>
+
+          <label id="viewPitchWrap">
+            View pitch (deg)
+            <div class="range-row">
+              <input id="viewPitchInput" type="range" min="-80" max="80" step="1" value="20" />
+              <input id="viewPitchValue" type="number" min="-80" max="80" step="1" value="20" />
             </div>
           </label>
 
@@ -135,34 +168,61 @@
             String length (cm)
             <div class="range-row">
               <input id="stringLengthInput" type="range" min="10" max="100" step="1" value="40" />
-              <output id="stringLengthValue">40</output>
+              <input id="stringLengthValue" type="number" min="10" max="100" step="1" value="40" />
             </div>
             <span class="control-note">Used only for the suspended-spheres style equilibrium bridge.</span>
           </label>
 
-          <label>
-            <span id="qALabel">Charge A</span>
+          <label id="chargeCountWrap" class="control-span-2">
+            Free-build charge count
+            <select id="chargeCountSelect">
+              <option value="2">2 charges</option>
+              <option value="3">3 charges</option>
+              <option value="4">4 charges</option>
+              <option value="5">5 charges</option>
+            </select>
+            <span class="control-note">Used only in the free 3D builder and capped at five charges.</span>
+          </label>
+
+          <label id="editChargeWrap" class="control-span-2">
+            Edit charge position
+            <select id="editChargeSelect"></select>
+            <span class="control-note">Use the sliders below to place the selected charge in three dimensions.</span>
+          </label>
+
+          <label id="xPositionWrap">
+            X position
             <div class="range-row">
-              <input id="qA" type="range" min="-8" max="8" step="0.1" value="4.5" />
-              <output id="qAValue">4.5</output>
+              <input id="xPositionInput" type="range" min="-4" max="4" step="0.1" value="0" />
+              <input id="xPositionValue" type="number" min="-4" max="4" step="0.1" value="0" />
             </div>
           </label>
 
-          <label>
-            <span id="qBLabel">Charge B</span>
+          <label id="yPositionWrap">
+            Y position
             <div class="range-row">
-              <input id="qB" type="range" min="-8" max="8" step="0.1" value="-3.0" />
-              <output id="qBValue">-3.0</output>
+              <input id="yPositionInput" type="range" min="-4" max="4" step="0.1" value="0" />
+              <input id="yPositionValue" type="number" min="-4" max="4" step="0.1" value="0" />
             </div>
           </label>
 
-          <label id="qCWrap">
-            <span id="qCLabel">Charge C</span>
+          <label id="zPositionWrap">
+            Z position
             <div class="range-row">
-              <input id="qC" type="range" min="-8" max="8" step="0.1" value="2.0" />
-              <output id="qCValue">2.0</output>
+              <input id="zPositionInput" type="range" min="-4" max="4" step="0.1" value="0" />
+              <input id="zPositionValue" type="number" min="-4" max="4" step="0.1" value="0" />
             </div>
           </label>
+
+          <section class="charge-editor control-span-2" id="chargeEditorSection" aria-labelledby="chargeEditorTitle">
+            <div class="control-stack-head">
+              <div>
+                <h3 id="chargeEditorTitle">Charge values</h3>
+                <p class="control-note">Adjust source and target magnitudes directly. For 3D scenes, click a charge to edit its position.</p>
+              </div>
+            </div>
+            <div id="chargeControlList" class="charge-control-list"></div>
+          </section>
 
           <label class="compact-toggle control-span-2">
             <input id="showVectors" type="checkbox" checked />
@@ -172,6 +232,11 @@
           <label class="compact-toggle control-span-2">
             <input id="showComponents" type="checkbox" checked />
             Show components and helper lines
+          </label>
+
+          <label class="compact-toggle control-span-2">
+            <input id="showAngles" type="checkbox" checked />
+            Show angle guides
           </label>
         </div>
 
@@ -224,6 +289,7 @@
                 <th scope="col">Interaction</th>
                 <th scope="col">Fx (N)</th>
                 <th scope="col">Fy (N)</th>
+                <th scope="col">Fz (N)</th>
                 <th scope="col">|F| (N)</th>
               </tr>
             </thead>
@@ -260,6 +326,8 @@
               <li><strong>Two Charges:</strong> sign logic, attraction vs repulsion, inverse-square changes.</li>
               <li><strong>Three on a Line:</strong> superposition in one dimension.</li>
               <li><strong>2D Triangle:</strong> net force from components.</li>
+              <li><strong>3D Pyramid, Cube, Icosahedron:</strong> use rotation plus azimuth/elevation angles to reason in space.</li>
+              <li><strong>Free 3D Builder:</strong> create your own arrangement with up to five charges.</li>
               <li><strong>U-235 Fission:</strong> tiny distance, huge force.</li>
               <li><strong>Equilibrium Bridge:</strong> connect electric force to force balance.</li>
             </ul>
@@ -274,7 +342,7 @@
             <ul class="help-list">
               <li><strong>Gold arrows:</strong> individual force contributions from source charges on the target.</li>
               <li><strong>Purple arrow:</strong> the net force after adding all contributions.</li>
-              <li><strong>Dashed Fx and Fy guides:</strong> the horizontal and vertical parts of the net vector.</li>
+              <li><strong>Dashed Fx, Fy, and Fz guides:</strong> the component path used to reconstruct the 3D net vector.</li>
               <li><strong>Distance line:</strong> shows the separation used in Coulomb's law.</li>
             </ul>
           </section>
@@ -302,6 +370,7 @@
             <ul class="help-list">
               <li>Turn <strong>Show force vectors</strong> on whenever students are comparing directions.</li>
               <li>Turn <strong>Show components and helper lines</strong> on when the net force has both x and y parts.</li>
+              <li>Turn <strong>Show angle guides</strong> on in 3D scenarios when students need azimuth and elevation, then hide it once they can infer the geometry.</li>
               <li>For line or equilibrium scenarios, focus students on left/right reasoning and the force table.</li>
             </ul>
           </section>
@@ -353,7 +422,7 @@
               <li><strong>Charge colors</strong> tell you whether the charge is positive or negative.</li>
               <li><strong>Gold force arrows</strong> are individual force contributions on the target.</li>
               <li><strong>Purple arrow</strong> is the net force after adding all contributions.</li>
-              <li><strong>Fx and Fy guides</strong> break the net force into components when that helps.</li>
+              <li><strong>Fx, Fy, and Fz guides</strong> break the net force into components when that helps.</li>
             </ul>
           </section>
 
@@ -362,6 +431,7 @@
             <ol class="help-list ordered">
               <li>Predict the direction of the force before changing anything.</li>
               <li>Drag charges or change values to test the prediction.</li>
+              <li>In 3D scenes, rotate the view and use the angle labels before trusting a single camera angle.</li>
               <li>Use the table and metric cards only after you have a claim.</li>
               <li>In practice mode, answer the questions before the numbers appear.</li>
             </ol>
