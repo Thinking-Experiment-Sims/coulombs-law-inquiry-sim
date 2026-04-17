@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap");
 
 :root {
+
   --bg-950: #e9f4fb;
   --bg-900: #fff4dd;
   --bg-800: #ffffff;
@@ -12,21 +13,21 @@
   --border: #c8dbe3;
   --shadow-lg: 0 12px 24px rgba(12, 54, 68, 0.12);
 
-  --bg-950: #090b0f;
-  --bg-900: #11141b;
-  --bg-800: #1e2430;
-  --text-100: #eef2f9;
-  --text-300: #c9d1df;
+  --bg-950: #e9f4fb;
+  --bg-900: #fff4dd;
+  --bg-800: #ffffff;
+  --text-100: #123140;
+  --text-300: #4b6570;
   --text-500: #a9b2c3;
-  --gold-500: #c8a24a;
-  --gold-400: #d8b767;
+  --gold-500: #0f7e9b;
+  --gold-400: #0b5f77;
   --gold-300: #e5cc8f;
-  --surface: rgba(17, 20, 27, 0.94);
+  --surface: rgba(255, 255, 255, 0.96);
   --surface-alt: rgba(30, 36, 48, 0.92);
   --surface-soft: rgba(24, 29, 38, 0.8);
-  --border: rgba(229, 204, 143, 0.24);
+  --border: #c8dbe3;
   --border-strong: rgba(229, 204, 143, 0.42);
-  --shadow-lg: 0 18px 38px rgba(0, 0, 0, 0.42);
+  --shadow-lg: 0 12px 24px rgba(12, 54, 68, 0.12);
   --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.24);
   --positive: #f3c86f;
   --negative: #f08ea8;
@@ -36,6 +37,7 @@
   --canvas-bottom: #0b0e14;
   --canvas-grid: rgba(229, 204, 143, 0.12);
   --canvas-axis: rgba(229, 204, 143, 0.28);
+
 }
 
 
@@ -53,14 +55,10 @@ body {
 }
 
 body {
-  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  font-family: "Inter", "IBM Plex Sans", sans-serif;
   color: var(--text-100);
-  background:
-    radial-gradient(circle at 12% 8%, rgba(216, 183, 103, 0.14), transparent 28%),
-    radial-gradient(circle at 86% 88%, rgba(216, 183, 103, 0.08), transparent 30%),
-    linear-gradient(165deg, #11141b, #090b0f 58%, #131821);
+  background: #e9f4fb;
   line-height: 1.45;
-  overflow-x: hidden;
 }
 
 
@@ -375,15 +373,9 @@ button {
   background: linear-gradient(160deg, #0d839f, #0b5f77);
   color: #ffffff;
   font-weight: 700;
-
-  border: 1px solid var(--gold-500);
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--gold-500), var(--gold-400));
-  color: #2c1d06;
-  font-weight: 700;
-  padding: 0.6rem 0.86rem;
+  border: 1px solid #0a5d74;
+  padding: 0.58rem 0.82rem;
   cursor: pointer;
-  transition: transform 140ms ease, filter 140ms ease, opacity 140ms ease;
 }
 
 button:hover {
@@ -408,10 +400,9 @@ body[data-theme="light"] button {
   background: linear-gradient(160deg, #0d839f, #0b5f77);
   color: #ffffff;
   font-weight: 700;
-
-  background: linear-gradient(160deg, #0d839f, #0b5f77);
-  color: #ffffff;
-  border-color: #0a5d74;
+  border: 1px solid #0a5d74;
+  padding: 0.58rem 0.82rem;
+  cursor: pointer;
 }
 
 body[data-theme="light"] button.ghost {
@@ -446,9 +437,9 @@ canvas:focus-visible {
   background: linear-gradient(160deg, #0d839f, #0b5f77);
   color: #ffffff;
   font-weight: 700;
-
-  flex: 1 1 0;
-  min-width: 0;
+  border: 1px solid #0a5d74;
+  padding: 0.58rem 0.82rem;
+  cursor: pointer;
 }
 
 .compact-action {
