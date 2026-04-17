@@ -1,6 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap");
 
 :root {
+  --bg-950: #e9f4fb;
+  --bg-900: #fff4dd;
+  --bg-800: #ffffff;
+  --text-100: #123140;
+  --text-300: #4b6570;
+  --gold-500: #0f7e9b;
+  --gold-400: #0b5f77;
+  --surface: rgba(255, 255, 255, 0.96);
+  --border: #c8dbe3;
+  --shadow-lg: 0 12px 24px rgba(12, 54, 68, 0.12);
+
   --bg-950: #090b0f;
   --bg-900: #11141b;
   --bg-800: #1e2430;
@@ -27,32 +38,7 @@
   --canvas-axis: rgba(229, 204, 143, 0.28);
 }
 
-body[data-theme="light"] {
-  --bg-950: #e9f4fb;
-  --bg-900: #fff4dd;
-  --bg-800: #ffffff;
-  --text-100: #143241;
-  --text-300: #49636d;
-  --text-500: #5e7179;
-  --gold-500: #0f7e9b;
-  --gold-400: #0b5f77;
-  --gold-300: #d67b19;
-  --surface: rgba(255, 255, 255, 0.97);
-  --surface-alt: rgba(246, 251, 253, 0.98);
-  --surface-soft: rgba(240, 248, 251, 0.92);
-  --border: #c8dbe3;
-  --border-strong: #95b8c6;
-  --shadow-lg: 0 12px 24px rgba(12, 54, 68, 0.12);
-  --shadow-md: 0 10px 18px rgba(12, 54, 68, 0.08);
-  --positive: #d67b19;
-  --negative: #0f7e9b;
-  --target: #123140;
-  --net: #7e5af0;
-  --canvas-top: #f8fcff;
-  --canvas-bottom: #edf7fb;
-  --canvas-grid: rgba(15, 126, 155, 0.11);
-  --canvas-axis: rgba(18, 49, 64, 0.24);
-}
+
 
 *,
 *::before,
@@ -77,12 +63,7 @@ body {
   overflow-x: hidden;
 }
 
-body[data-theme="light"] {
-  background:
-    radial-gradient(1200px 700px at 8% 2%, rgba(19, 143, 176, 0.18), transparent 62%),
-    radial-gradient(900px 600px at 92% 98%, rgba(220, 132, 32, 0.18), transparent 66%),
-    linear-gradient(165deg, #e9f4fb, #fff4dd);
-}
+
 
 .bg-grid {
   position: fixed;
@@ -213,10 +194,10 @@ body[data-theme="light"] .hero {
 
 .panel {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 1rem;
   background: var(--surface);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 6px 16px rgba(12, 54, 68, 0.08);
 }
 
 .full {
@@ -390,6 +371,11 @@ output {
 }
 
 button {
+  border-radius: 10px;
+  background: linear-gradient(160deg, #0d839f, #0b5f77);
+  color: #ffffff;
+  font-weight: 700;
+
   border: 1px solid var(--gold-500);
   border-radius: 10px;
   background: linear-gradient(135deg, var(--gold-500), var(--gold-400));
@@ -418,6 +404,11 @@ button.ghost {
 }
 
 body[data-theme="light"] button {
+  border-radius: 10px;
+  background: linear-gradient(160deg, #0d839f, #0b5f77);
+  color: #ffffff;
+  font-weight: 700;
+
   background: linear-gradient(160deg, #0d839f, #0b5f77);
   color: #ffffff;
   border-color: #0a5d74;
@@ -451,6 +442,11 @@ canvas:focus-visible {
 }
 
 .button-row button {
+  border-radius: 10px;
+  background: linear-gradient(160deg, #0d839f, #0b5f77);
+  color: #ffffff;
+  font-weight: 700;
+
   flex: 1 1 0;
   min-width: 0;
 }
