@@ -182,19 +182,6 @@ h4 {
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
-.hero-layout {
-  margin-top: 0.95rem;
-  margin-bottom: 0;
-}
-
-.hero-frame footer {
-  text-align: center;
-  color: var(--text-500);
-  padding: 1.4rem 0 0.2rem;
-  margin-top: 0.8rem;
-  font-size: 0.88rem;
-}
-
 .panel {
   border: 1px solid var(--border);
   border-radius: 12px;
