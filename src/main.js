@@ -1,7 +1,6 @@
 const K = 8.9875517923e9;
 const G = 9.81;
 const E_CHARGE = 1.602176634e-19;
-const STORAGE_KEY_THEME = "coulomb-inquiry-theme";
 const STORAGE_KEY_ACTIVITY = "coulomb-inquiry-activity";
 const STORAGE_KEY_PRESET = "coulomb-inquiry-preset";
 
@@ -17,7 +16,6 @@ const teacherGuideDialog = $("teacherGuideDialog");
 const studentHelpDialog = $("studentHelpDialog");
 const closeTeacherGuideBtn = $("closeTeacherGuideBtn");
 const closeStudentHelpBtn = $("closeStudentHelpBtn");
-const themeToggleBtn = $("themeToggleBtn");
 const activityMode = $("activityMode");
 const presetSelect = $("presetSelect");
 const targetSelect = $("targetSelect");
@@ -364,7 +362,6 @@ const PRESETS = {
 };
 
 const state = {
-  theme: "dark",
   activity: "inquiry",
   presetKey: "pair",
   charges: [],
@@ -397,7 +394,6 @@ init();
 function init() {
   populatePresetOptions();
 
-  state.theme = localStorage.getItem(STORAGE_KEY_THEME) || "dark";
   state.activity = localStorage.getItem(STORAGE_KEY_ACTIVITY) || "inquiry";
   state.presetKey = localStorage.getItem(STORAGE_KEY_PRESET) || "pair";
   if (state.presetKey === "free3d") {
@@ -409,7 +405,6 @@ function init() {
   showComponents.checked = true;
   showAngles.checked = true;
 
-  applyTheme(state.theme);
   loadPreset(state.presetKey);
   setActivity(state.activity, { rerender: false });
 
@@ -417,7 +412,6 @@ function init() {
   teacherGuideBtn.addEventListener("click", () => openDialog(teacherGuideDialog));
   closeTeacherGuideBtn.addEventListener("click", () => closeDialog(teacherGuideDialog));
   closeStudentHelpBtn.addEventListener("click", () => closeDialog(studentHelpDialog));
-  themeToggleBtn.addEventListener("click", toggleTheme);
   activityMode.addEventListener("change", () => setActivity(activityMode.value));
   presetSelect.addEventListener("change", () => loadPreset(presetSelect.value));
   targetSelect.addEventListener("change", () => {
@@ -584,18 +578,6 @@ function setActivity(mode, { rerender = true } = {}) {
     regeneratePractice();
     renderAll();
   }
-}
-
-function applyTheme(theme) {
-  state.theme = theme;
-  document.body.dataset.theme = theme;
-  themeToggleBtn.textContent = theme === "light" ? "Dark mode" : "Light mode";
-  localStorage.setItem(STORAGE_KEY_THEME, theme);
-}
-
-function toggleTheme() {
-  applyTheme(state.theme === "light" ? "dark" : "light");
-  renderAll();
 }
 
 function getPreset() {
@@ -2378,11 +2360,11 @@ function getPalette() {
     target: styles.getPropertyValue("--target").trim(),
     net: styles.getPropertyValue("--net").trim(),
     outline: styles.getPropertyValue("--border-strong").trim(),
-    signText: document.body.dataset.theme === "light" ? "#ffffff" : "#130f08",
-    labelBg: document.body.dataset.theme === "light" ? "rgba(255,255,255,0.9)" : "rgba(17,20,27,0.86)",
+    signText: "#ffffff",
+    labelBg: "rgba(255,255,255,0.9)",
     labelText: styles.getPropertyValue("--text-100").trim(),
-    targetLabelBg: document.body.dataset.theme === "light" ? "#123140" : "rgba(255,255,255,0.9)",
-    targetLabelText: document.body.dataset.theme === "light" ? "#ffffff" : "#11141b",
+    targetLabelBg: "#123140",
+    targetLabelText: "#ffffff",
   };
 }
 
